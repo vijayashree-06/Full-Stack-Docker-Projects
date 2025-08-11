@@ -1,10 +1,11 @@
 const express = require('express');
 const { Client } = require('pg');
 const app = express();
-const port = 5000;
+
+const port = process.env.PORT || 5000;
 
 const dbClient = new Client({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'db', 
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'testdb',
@@ -13,7 +14,10 @@ const dbClient = new Client({
 
 dbClient.connect()
   .then(() => console.log('Connected to Postgres'))
-  .catch((err) => console.error('Failed to connect to Postgres', err));
+  .catch((err) => {
+    console.error('Failed to connect to Postgres', err);
+    process.exit(1); 
+  });
 
 app.get('/api', async (req, res) => {
   try {
@@ -25,6 +29,6 @@ app.get('/api', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Backend listening at http://localhost:${port}`);
 });
